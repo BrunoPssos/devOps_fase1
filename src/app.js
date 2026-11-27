@@ -1,14 +1,16 @@
 const express = require('express');
+const { defaultLogger, requestLogger } = require('./logger');
 
-function createApp() {
+function createApp({ logger = defaultLogger } = {}) {
   const app = express();
+  app.use(requestLogger(logger));
   app.use(express.json());
 
   let tarefas = [];
   let proximoId = 1;
 
   app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+    res.status(200).json({ status: 'ok', uptime_s: Math.round(process.uptime()) });
   });
 
   app.get('/tarefas', (req, res) => {
@@ -42,6 +44,21 @@ function createApp() {
     }
     tarefas = tarefas.filter((t) => t.id !== id);
     return res.status(204).send();
+  });
+
+  // JSON inválido no corpo da requisição devolve 400 em vez de uma página HTML de erro.
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    if (err.type === 'entity.parse.failed') {
+      return res.status(400).json({ erro: 'JSON inválido no corpo da requisição.' });
+    }
+    logger({
+      time: new Date().toISOString(),
+      level: 'error',
+      msg: 'erro não tratado',
+      error: err.message,
+    });
+    return res.status(500).json({ erro: 'Erro interno do servidor.' });
   });
 
   return app;
