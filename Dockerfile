@@ -1,5 +1,5 @@
 # Imagem de produção da Task API
-FROM node:20-alpine
+FROM node:26-alpine
 
 ENV NODE_ENV=production \
     PORT=3000
