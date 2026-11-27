@@ -1,0 +1,20 @@
+flowchart LR
+    A([Push ou Pull Request<br/>na branch main]) --> B[GitHub Actions<br/>workflow CI-CD]
+    B --> L[Lint<br/>ESLint] --> T[Testes Jest + Supertest<br/>Node 18 e 20] --> DB[Build da<br/>imagem Docker]
+    B --> S[Segurança<br/>npm audit]
+    B --> TF[Terraform<br/>fmt, init, validate]
+    DB --> G{Todos os<br/>jobs passaram?}
+    S --> G
+    TF --> G
+    G -- Não --> X([Pipeline vermelho<br/>nada é publicado])
+    G -- "Sim, Pull Request" --> P([Fim: só validação])
+    G -- "Sim, push na main" --> N([Segue para o CD])
+
+    classDef ci fill:#DCE6FF,stroke:#3B4A9C,color:#1C2452;
+    classDef bad fill:#FBE0E0,stroke:#B3342F,color:#5A1512;
+    classDef ok fill:#FFF2CC,stroke:#9C7B16,color:#4A3A08;
+    classDef cd fill:#DDF3E4,stroke:#2E7D4F,color:#14391F;
+    class L,T,DB,S,TF ci;
+    class X bad;
+    class A,B,P,G ok;
+    class N cd;

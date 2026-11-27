@@ -1,0 +1,13 @@
+flowchart LR
+    N([Pipeline de CI<br/>aprovado na main]) --> I[Publicar imagem<br/>no GHCR<br/>tags: SHA e latest]
+    I --> D[Deploy<br/>scripts/deploy.sh<br/>docker compose up]
+    D --> H{Health check<br/>em /health<br/>até 60 s?}
+    H -- Sim --> SM[Smoke test<br/>scripts/smoke-test.sh] --> OK([Nova versão<br/>em execução]) --> M[Monitoramento<br/>HEALTHCHECK e logs JSON]
+    H -- Não --> R[Rollback para<br/>a tag anterior] --> F([Deploy falhou<br/>pipeline vermelho])
+
+    classDef cd fill:#DDF3E4,stroke:#2E7D4F,color:#14391F;
+    classDef bad fill:#FBE0E0,stroke:#B3342F,color:#5A1512;
+    classDef ok fill:#FFF2CC,stroke:#9C7B16,color:#4A3A08;
+    class I,D,SM,M cd;
+    class R,F bad;
+    class N,OK,H ok;
