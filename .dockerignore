@@ -1,0 +1,11 @@
+node_modules
+coverage
+tests
+terraform
+docs
+scripts
+.git
+.github
+.eslintrc.json
+*.md
+docker-compose.yml
